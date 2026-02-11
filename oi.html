@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Velvet Night — Untukmu</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg: #0a0509;
+      --panel: #140c14;
+      --rose: #ff6b95;
+      --rose-light: #ff9db3;
+      --gold: #e2c07d;
+      --gold-light: #f0d9a4;
+      --muted: #e8dfe1;
+      --ease-romantic: cubic-bezier(0.22, 1, 0.36, 1);
+      --shadow: 0 30px 80px rgba(0,0,0,0.8);
+      --glow: 0 0 30px rgba(255,107,149,0.3);
+    }
+    
+    *{box-sizing:border-box; margin:0; padding:0}
+    html,body{height:100%; overflow:hidden}
+    body{
+      min-height:100vh;
+      display:flex; align-items:center; justify-content:center;
+      background: 
+        radial-gradient(1200px 600px at 50% 0%, rgba(255,107,149,0.05), transparent),
+        radial-gradient(1000px 800px at 50% 100%, rgba(226,192,125,0.03), transparent),
+        linear-gradient(180deg, var(--bg), #020102);
+      font-family: 'Inter', system-ui, sans-serif;
+      color: var(--muted);
+      -webkit-font-smoothing: antialiased;
+      position: relative;
+    }
+
+    .bg-decoration {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+    
+    .card{
+      width: min(760px, 92%);
+      max-width: 720px;
+      padding: 32px;
+      border-radius: 24px;
+      background: linear-gradient(160deg, rgba(255,255,255,0.03), rgba(0,0,0,0.05));
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.08);
+      position: relative;
+      z-index: 10;
+      transition: transform 0.8s var(--ease-romantic), opacity 0.8s ease;
+      will-change: transform;
+    }
+
+    .head{
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      margin-bottom: 30px;
+      text-align: left;
+    }
+    
+    .logo{
+      width: 70px;
+      height: 70px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #2a0e1c, #4a1930);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    
+    .title h1{
+      font-family: 'Playfair Display', serif;
+      color: var(--gold);
+      font-size: 26px;
+      font-weight: 700;
+      background: linear-gradient(to right, var(--gold), var(--gold-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .title p{
+      margin-top: 4px;
+      color: rgba(255,255,255,0.6);
+      font-size: 15px;
+    }
+
+    .stage{
+      margin-top: 10px;
+      border-radius: 20px;
+      padding: 24px;
+      background: rgba(0,0,0,0.2);
+      position: relative;
+      overflow: hidden;
+      height: 280px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .prompt{
+      position: absolute;
+      left: 24px;
+      top: 24px;
+      font-size: 18px;
+      color: rgba(255,255,255,0.95);
+      font-weight: 400;
+      z-index: 2;
+    }
+
+    .controls{
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      z-index: 3;
+    }
+    
+    .btn{
+      padding: 16px 36px;
+      border-radius: 16px;
+      border: none;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      letter-spacing: 0.5px;
+      will-change: transform;
+    }
+    
+    .yes{
+      background: linear-gradient(135deg, var(--rose), #e91e63);
+      color: white;
+      box-shadow: 0 8px 25px rgba(233, 30, 99, 0.3);
+    }
+    
+    .yes:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 12px 35px rgba(233, 30, 99, 0.4);
+    }
+    
+    .no{
+      background: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.8);
+      border: 1px solid rgba(255,255,255,0.1);
+      backdrop-filter: blur(4px);
+    }
+
+    .poem-overlay{
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.0);
+      backdrop-filter: blur(0px);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 1000;
+      transition: all 1.5s var(--ease-romantic);
+    }
+    
+    .poem-overlay.show{
+      opacity: 1;
+      pointer-events: auto;
+      background: rgba(5, 2, 8, 0.75);
+      backdrop-filter: blur(12px);
+    }
+    
+    .poem-card{
+      width: min(600px, 85%);
+      /* PERBAIKAN: Menambahkan max-height dan overflow agar tidak tertutup di Chrome */
+      max-height: 85vh;
+      overflow-y: auto;
+      background: linear-gradient(145deg, #1f0b18, #2d1020);
+      padding: 40px 30px;
+      border-radius: 28px;
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 40px 100px rgba(0,0,0,0.9), 0 0 50px rgba(255, 107, 149, 0.15);
+      text-align: center;
+      transform: translateY(40px) scale(0.95);
+      opacity: 0;
+      transition: all 1.2s var(--ease-romantic);
+      transition-delay: 0.2s;
+      scrollbar-width: none; /* Sembunyikan scrollbar di Firefox */
+    }
+
+    .poem-card::-webkit-scrollbar { display: none; } /* Sembunyikan scrollbar di Chrome */
+    
+    .poem-overlay.show .poem-card{
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+    
+    .poem-content h2{
+      font-family: 'Playfair Display', serif;
+      color: var(--gold);
+      font-size: 32px;
+      margin-bottom: 24px;
+      text-shadow: 0 4px 20px rgba(226, 192, 125, 0.3);
+    }
+    
+    .poem-content p{
+      color: rgba(255,255,255,0.9);
+      font-size: 19px;
+      line-height: 1.8;
+      font-weight: 300;
+      margin-bottom: 32px;
+    }
+
+    /* --- ANIMASI LIRIK: Smooth & Natural --- */
+    .poem-content p span {
+      display: block;
+      opacity: 0;
+      filter: blur(10px);
+      transform: translateY(15px);
+      transition: opacity 1.2s ease, filter 1.2s ease, transform 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .poem-content p span.reveal {
+      opacity: 1;
+      filter: blur(0);
+      transform: translateY(0);
+    }
+
+    .close-btn{
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.6);
+      padding: 12px 30px;
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+    
+    .close-btn:hover{
+      background: rgba(255,255,255,0.05);
+      color: white;
+      border-color: rgba(255,255,255,0.4);
+    }
+
+    canvas{
+      position: fixed;
+      left: 0; top: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 1;
+    }
+    
+    @media (max-width: 600px){
+      .card{ padding: 24px; width: 90%; }
+      .stage{ height: 320px; }
+      .controls{ flex-direction: column; gap: 16px; }
+      .btn{ width: 100%; }
+      .poem-card{ padding: 32px 20px; }
+      .poem-content h2{ font-size: 26px; }
+      .poem-content p{ font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="particleCanvas"></canvas>
+
+  <div class="card">
+    <div class="head">
+      <div class="logo">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="#ff9db3">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+      </div>
+      <div class="title">
+        <h1>untuk lala</h1>
+        <p>dari rasa yang terpendam</p>
+      </div>
+    </div>
+
+    <div class="stage" id="stage">
+      <div class="prompt">Mauka dirimu yang indah itu untuk sekedar membaca puisi cinta dariku</div>
+      <div class="controls" id="controls">
+        <button class="btn yes" id="yes">Ya, dengan senang hati 💖</button>
+        <button class="btn no" id="no">Tidak sekarang</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="poem-overlay" id="poem">
+    <div class="poem-card">
+      <div class="poem-content">
+        <h2>for you, and only you</h2>
+        <p id="lyricText">
+          Kepadamu,
+ingin kutitipkan samudra.
+Bukan hanya luasnya,
+tetapi dalam yang gelap dan tak tersentuh,
+tempat rahasia paling sunyi berani berbisik.
+Di sana, namamu tenggelam—
+namun justru abadi...
+
+<br>
+
+          Dan langit…
+ah, langit selalu cemburu padamu.
+Sebab birunya tak pernah sebiru tatapmu,
+senjanya tak pernah sehangat senyummu,
+dan hujannya tak pernah sedalam air mataku
+saat membayangkan kehilanganmu...<br>
+          Jika kelak dunia runtuh,
+jika laut mengering
+dan bintang-bintang gugur tanpa suara,
+biarlah satu hal tetap utuh,
+rasaku padamu...,<br>
+          Karena aku mencintaimu
+bukan hanya sebesar samudra,
+bukan hanya setinggi angkasa,
+bukan hanya seluas langit...<br><br>
+          bahkan di antara miliar manusia yang berlalu,<br>
+          Hanya dirimu yang kutunggu....
+        </p>
+      </div>
+      <button class="close-btn" id="closePoem">Tutup & Matikan Lagu</button>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    const CONFIG = {
+      audioNo: "tidak.mp3", 
+      audioYes: "iya.mp3",
+      musicBg: "lagu.mp3" 
+    };
+
+    const sfxNo = new Audio(CONFIG.audioNo);
+    const sfxYes = new Audio(CONFIG.audioYes);
+    const bgm = new Audio(CONFIG.musicBg);
+    
+    bgm.loop = true;
+    bgm.volume = 0.6;
+    sfxYes.volume = 0.8;
+    sfxNo.volume = 0.4;
+
+    const canvas = document.getElementById('particleCanvas');
+    const ctx = canvas.getContext('2d', { alpha: true });
+    
+    let DPR = Math.min(window.devicePixelRatio || 1, 2);
+    function resize(){
+      canvas.width = window.innerWidth * DPR;
+      canvas.height = window.innerHeight * DPR;
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    const heartSprites = {};
+    const colors = ['#ff9db3', '#ffc9d6', '#ffd27f', '#e2c07d', '#ff6b95'];
+    
+    function initSprites(){
+      colors.forEach(c => {
+        const s = document.createElement('canvas');
+        s.width = 60; s.height = 60;
+        const x = s.getContext('2d');
+        x.translate(30,30);
+        x.beginPath();
+        x.moveTo(0, 15);
+        x.bezierCurveTo(-30, -15, -30, 25, 0, 30);
+        x.bezierCurveTo(30, 25, 30, -15, 0, 15);
+        x.fillStyle = c;
+        x.shadowColor = c; x.shadowBlur = 10;
+        x.fill();
+        heartSprites[c] = s;
+      });
+    }
+    initSprites();
+
+    let particles = [];
+    function spawn(){
+      particles.push({
+        x: Math.random() * window.innerWidth,
+        y: window.innerHeight + 50,
+        vx: (Math.random() - 0.5) * 0.5,
+        vy: -(0.5 + Math.random()),
+        size: 10 + Math.random() * 15,
+        life: 1,
+        color: colors[Math.floor(Math.random()*colors.length)]
+      });
+    }
+
+    function burst(x, y){
+      for(let i=0; i<30; i++){
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 1 + Math.random() * 4;
+        particles.push({
+          x: x, y: y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          size: 8 + Math.random() * 10,
+          life: 1,
+          decay: 0.01 + Math.random() * 0.02,
+          gravity: 0.05,
+          color: colors[Math.floor(Math.random()*colors.length)],
+          type: 'burst'
+        });
+      }
+    }
+
+    let last = performance.now();
+    function animate(now){
+      if(now - last > 200) { spawn(); last = now; }
+      ctx.clearRect(0,0,window.innerWidth, window.innerHeight);
+      for(let i=particles.length-1; i>=0; i--){
+        let p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        if(p.type === 'burst'){
+          p.vy += p.gravity;
+          p.life -= p.decay;
+        } else {
+          p.life -= 0.002;
+        }
+        if(p.life <= 0){ particles.splice(i,1); continue; }
+        ctx.globalAlpha = Math.max(0, p.life);
+        if(heartSprites[p.color]){
+          const s = p.size;
+          ctx.drawImage(heartSprites[p.color], p.x - s/2, p.y - s/2, s, s);
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+    animate(performance.now());
+
+    const yesBtn = document.getElementById('yes');
+    const noBtn = document.getElementById('no');
+    const poem = document.getElementById('poem');
+    const closePoem = document.getElementById('closePoem');
+    const controls = document.getElementById('controls');
+    const lyricEl = document.getElementById('lyricText');
+
+    const rawLines = lyricEl.innerHTML.split('<br>');
+    lyricEl.innerHTML = rawLines.map(line => `<span>${line}</span>`).join('');
+
+    noBtn.addEventListener('mouseover', moveButton);
+    noBtn.addEventListener('click', moveButton);
+
+    function moveButton(e){
+      e.stopPropagation();
+      sfxNo.currentTime = 0;
+      sfxNo.play().catch(() => {});
+      const rect = controls.getBoundingClientRect();
+      const btnRect = noBtn.getBoundingClientRect();
+      if(noBtn.style.position !== 'absolute'){
+        noBtn.style.position = 'absolute';
+        noBtn.style.left = (btnRect.left - rect.left) + 'px';
+        noBtn.style.top = (btnRect.top - rect.top) + 'px';
+      }
+      const maxX = rect.width - btnRect.width;
+      const maxY = rect.height - btnRect.height;
+      const newX = Math.random() * maxX;
+      const newY = Math.random() * maxY;
+      noBtn.style.transition = "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+      noBtn.style.left = newX + "px";
+      noBtn.style.top = newY + "px";
+    }
+
+    yesBtn.addEventListener('click', function(){
+      sfxYes.play().catch(() => {});
+      bgm.currentTime = 0;
+      bgm.play().catch(err => console.log("Audio block:", err));
+      const r = yesBtn.getBoundingClientRect();
+      burst(r.left + r.width/2, r.top + r.height/2);
+      poem.classList.add('show');
+
+      const spans = lyricEl.querySelectorAll('span');
+      spans.forEach((span, i) => {
+        span.classList.remove('reveal');
+        setTimeout(() => {
+          span.classList.add('reveal');
+        }, 1200 + (i * 950)); 
+      });
+    });
+
+    closePoem.addEventListener('click', function(){
+      poem.classList.remove('show');
+      bgm.pause();
+      bgm.currentTime = 0;
+    });
+
+  })();
+  </script>
+</body>
+</html>
